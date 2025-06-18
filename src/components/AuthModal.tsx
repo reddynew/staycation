@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext"; // Ensure correct path
 
 interface AuthModalProps {
   open: boolean;
@@ -20,53 +20,80 @@ interface AuthModalProps {
 }
 
 export const AuthModal = ({ open, onClose }: AuthModalProps) => {
+  const { login, register } = useAuth(); // Get authentication functions
   const [isLoading, setIsLoading] = useState(false);
+  const[tab,setTab]=useState('register')
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Todo: Implement authentication
-    setTimeout(() => {
+
+    try {
+      await login(formData.email, formData.password);
+      
+      onClose(); // Close modal on success
+    } catch (error) {
+      console.error("Login failed", error);
+    } finally {
       setIsLoading(false);
-      onClose();
-    }, 2000);
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await register(formData.email, formData.password);
+      setTab('login')
+      // onClose(); // Close modal on success
+    } catch (error) {
+      console.error("Registration failed", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] p-0">
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
           </TabsList>
+
+          {/* Login Form */}
           <TabsContent value="login">
             <Card>
               <CardHeader>
                 <CardTitle>Login</CardTitle>
-                <CardDescription>
-                  Welcome back! Login to your account.
-                </CardDescription>
+                <CardDescription>Welcome back! Login to your account.</CardDescription>
               </CardHeader>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleLogin}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john@example.com"
-                      required
-                    />
+                    <Input id="email" type="email" placeholder="john@example.com" required onChange={handleChange} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                    />
+                    <Input id="password" type="password" placeholder="••••••••" required onChange={handleChange} />
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -77,42 +104,27 @@ export const AuthModal = ({ open, onClose }: AuthModalProps) => {
               </form>
             </Card>
           </TabsContent>
+
+          {/* Register Form */}
           <TabsContent value="register">
             <Card>
               <CardHeader>
                 <CardTitle>Create Account</CardTitle>
-                <CardDescription>
-                  Sign up for a new account to get started.
-                </CardDescription>
+                <CardDescription>Sign up for a new account to get started.</CardDescription>
               </CardHeader>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleRegister}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-email">Email</Label>
-                    <Input
-                      id="register-email"
-                      type="email"
-                      placeholder="john@example.com"
-                      required
-                    />
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="john@example.com" required onChange={handleChange} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="register-password">Password</Label>
-                    <Input
-                      id="register-password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                    />
+                    <Label htmlFor="password">Password</Label>
+                    <Input id="password" type="password" placeholder="••••••••" required onChange={handleChange} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                    />
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Input id="confirmPassword" type="password" placeholder="••••••••" required onChange={handleChange} />
                   </div>
                 </CardContent>
                 <CardFooter>

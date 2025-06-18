@@ -18,9 +18,10 @@ import { useHotels } from "@/contexts/HotelContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { toast } from "sonner";
+import Favourites from "../pages/Favourites"
 
 const Profile = () => {
-  const { bookings } = useHotels();
+  const { bookings,favourites } = useHotels();
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState({
@@ -144,7 +145,6 @@ const Profile = () => {
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
                         {booking.guests} guests
                       </div>
                     </div>
@@ -153,6 +153,13 @@ const Profile = () => {
               ))}
             </div>
           </div>
+          
+          <div className="space-y-4">
+  <h2 className="text-2xl font-semibold">Your Favourites</h2>
+  <Favourites/>
+</div>
+
+
         </div>
       </main>
       <Footer />

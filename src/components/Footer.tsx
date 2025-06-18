@@ -1,5 +1,6 @@
 
 import { Heart } from "lucide-react";
+import  MapComponent  from "./Map";
 
 export const Footer = () => {
   return (
@@ -12,10 +13,13 @@ export const Footer = () => {
               href="#"
               className="font-medium underline underline-offset-4"
             >
-              StayPlay
+              ALL_LOCALS
             </a>
             . All rights reserved © {new Date().getFullYear()}
           </p>
+          {/* <div>
+          <MapComponent />
+            </div> */}
         </div>
       </div>
     </footer>

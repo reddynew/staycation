@@ -99,3 +99,6 @@
     @apply bg-background text-foreground;
   }
 }
+.card-hover {
+  @apply transition-all duration-300 ease-in-out transform hover:-translate-y-2 hover:shadow-xl;
+}
